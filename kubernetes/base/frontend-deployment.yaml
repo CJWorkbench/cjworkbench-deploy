@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    workbenchdata.com/unsafe: "true"
+    workbenchdata.com/uses-database: "true"
+    workbenchdata.com/uses-rabbitmq: "true"
+    workbenchdata.com/uses-s3: "true"
+    workbenchdata.com/uses-smtp: "true"
+spec:
+  selector:
+    matchLabels:
+      app: frontend-app
+  template:
+    metadata:
+      labels:
+        app: frontend-app
+    spec:
+      serviceAccountName: frontend-sa
+      initContainers:
+      # setup-sandboxes.sh needs special privileges; run it in an init container.
+      #
+      # We run this command separately because it runs with privileged: true.
+      # (pyspawner shouldn't have permission to fiddle with the mount
+      # namespace, lest malicious code use that permission to somehow escape
+      # its sandbox.)
+      #
+      # See https://itnext.io/using-overlay-mounts-with-kubernetes-960375c05959
+      - name: setup-sandboxes
+        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        securityContext:
+          privileged: true  # so it can run mount
+        command: [ "bash", "-x", "/app/cjwkernel/setup-sandboxes.sh", "only-readonly" ]
+        volumeMounts:
+        - mountPath: /var/lib/cjwkernel/chroot
+          name: chroot
+          mountPropagation: Bidirectional  # expose mounts to main app
+      containers:
+      - name: app
+        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        ports:
+        - name: http
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        envFrom:
+        - secretRef:
+            name: cjw-smtp-config
+          prefix: CJW_SMTP_  # CJW_SMTP_HOST, CJW_SMTP_USER, CJW_SMTP_PASSWORD, CJW_SMTP_PORT, CJW_SMTP_USE_TLS
+        - configMapRef:
+            name: cjw-heap-analytics  # CJW_HEAP_ANALYTICS_ID
+        - configMapRef:
+            name: cjw-intercom  # CJW_INTERCOM_APP_ID
+        - configMapRef:
+            name: cjw-google-analytics  # CJW_GOOGLE_ANALYTICS
+        env:
+        - name: CJW_PRODUCTION
+          value: 'True'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: ASGI_THREADS
+          value: '5'
+        - name: CJW_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cjw-secret-key
+              key: value
+        - name: HTTPS
+          value: 'on'
+        - name: _DOMAIN_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: workbench-config
+              key: domainName
+        - name: S3_BUCKET_NAME_PATTERN
+          value: '%s.$(_DOMAIN_NAME)'
+        - name: STATIC_URL
+          value: 'https://static.$(_DOMAIN_NAME)/'
+        - name: TUS_CREATE_UPLOAD_URL
+          value: "http://tusd-internal-service/files"
+        - name: TUS_EXTERNAL_URL_PREFIX_OVERRIDE
+          value: "https://upload.$(_DOMAIN_NAME)/files"
+        volumeMounts:
+        - mountPath: /var/lib/cjwkernel/chroot
+          name: chroot
+      - name: teardown-sandboxes
+        # "any volume mounts created by Containers in Pods must be destroyed
+        # (unmounted) by the Containers on termination"
+        # -- https://kubernetes.io/docs/concepts/storage/volumes/#mount-propagation
+        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        command: ["sh", "-c", "sleep infinity"]  # do nothing, until exit. (sh responds to INT signal)
+        securityContext:
+          privileged: true  # so it can unmount
+        lifecycle:
+          preStop:
+            exec:
+              command: ["bash", "-x", "/app/cjwkernel/teardown-sandboxes.sh"]
+        volumeMounts:
+        - mountPath: /var/lib/cjwkernel/chroot
+          name: chroot
+          mountPropagation: Bidirectional  # expose mounts to main app
+      volumes:
+      - name: chroot
+        emptyDir: {}

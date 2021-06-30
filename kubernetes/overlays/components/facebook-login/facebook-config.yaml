@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_FACEBOOK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: cjw-facebook-secret
+              key: client_id
+        - name: CJW_FACEBOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cjw-facebook-secret
+              key: secret

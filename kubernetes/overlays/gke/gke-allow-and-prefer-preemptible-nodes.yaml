@@ -1,0 +1,19 @@
+- op: replace
+  path: /spec/template/spec/tolerations
+  value:
+  # Allow scheduling on preemptible nodes. (Work is expensive to run, cheap to retry.)
+  - key: preemptible
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
+- op: add
+  path: /spec/template/spec/affinity
+  value:
+    nodeAffinity: # Move to preemptible nodes whenever one is available
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: cloud.google.com/gke-preemptible
+            operator: In
+            values: [ "true" ]

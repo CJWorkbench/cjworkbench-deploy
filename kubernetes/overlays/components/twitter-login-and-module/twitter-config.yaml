@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: many
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_TWITTER_CLIENT_SECRETS
+          value: secrets/twitter-oauth-secret/twitter-oauth-secret.json
+        volumeMounts:
+        - mountPath: /app/secrets/twitter-oauth-secret
+          name: twitter-oauth-secret
+          readOnly: true
+      volumes:
+      - name: twitter-oauth-secret
+        secret:
+          secretName: twitter-oauth-secret
+          defaultMode: 0400
+          items:
+            - key: json
+              path: twitter-oauth-secret.json

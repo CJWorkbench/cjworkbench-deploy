@@ -1,0 +1,16 @@
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        resources:
+          requests:
+            # We have no SMT, and we want 1 pod per node. Pods have ~1.5 CPUs
+            cpu: 1400m
+            memory: 2Gi
+          limits:
+            cpu: 1400m
+            memory: 2Gi

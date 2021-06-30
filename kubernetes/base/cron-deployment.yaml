@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cron-deployment
+  labels:
+    workbenchdata.com/preemptible: "true"
+    workbenchdata.com/uses-database: "true"
+    workbenchdata.com/uses-rabbitmq: "true"
+spec:
+  selector:
+    matchLabels:
+      app: cron-app
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cron-app
+    spec:
+      serviceAccountName: cron-sa
+      containers:
+      - name: app
+        image: "gcr.io/workbenchdata-ci/cron:latest"
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 200Mi
+          limits:
+            cpu: 0.1
+            memory: 200Mi
+        envFrom: []
+        env:
+        - name: CJW_PRODUCTION
+          value: 'True'
+        - name: PYTHONUNBUFFERED
+          value: '1'
+        - name: ASGI_THREADS
+          value: '2'
+        - name: _DOMAIN_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: workbench-config
+              key: domainName
+        - name: S3_BUCKET_NAME_PATTERN
+          value: "%s.$(_DOMAIN_NAME)"

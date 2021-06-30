@@ -1,0 +1,15 @@
+- op: add
+  path: /spec/template/spec/nodeSelector
+  value:
+    # Only schedule on nodes that disallow SMT. (Pod runs untrusted user code.)
+    cloud.google.com/gke-smt-disabled: "true"
+- op: add
+  path: /spec/template/spec/tolerations
+  value:
+    # SMT-disabled nodes are expensive, so they're tainted. (That's why other
+    # pods aren't scheduled on them by accident.) Tolerate the taint.
+  - key: "no-smt"
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
+

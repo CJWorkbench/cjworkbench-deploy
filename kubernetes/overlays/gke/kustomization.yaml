@@ -1,0 +1,51 @@
+bases:
+- ../../base
+
+patches:
+- scale-fetcher.yaml  # same size on staging+production
+- scale-renderer.yaml  # same size on staging+production
+- scale-frontend.yaml  # same size on staging+production
+
+replicas:
+- name: fetcher-deployment
+  count: 7  # steady load, mostly from autofetches
+- name: renderer-deployment
+  count: 3  # steady load because autofetches
+- name: frontend-deployment
+  count: 4  # steady load: most requests are for our (icky) API endpoints
+
+configMapGenerator:
+- name: cjw-cloud-sql-config
+  literals:
+  - PROJECT_NAME=
+  - POSTGRES_REGION=
+  - POSTGRES_INSTANCE_ID=
+
+patches:
+- path: gke-cloudsql.yaml
+  target:
+    labelSelector: "workbenchdata.com/uses-database=true"
+- path: gke-only-run-on-smt-disabled-nodes.yaml
+  target:
+    labelSelector: "workbenchdata.com/unsafe=true"
+- path: gke-allow-and-prefer-preemptible-nodes.yaml
+  target:
+    labelSelector: "workbenchdata.com/preemptible=true"
+- path: gke-deprecated-rabbitmq.yaml
+  target:
+    labelSelector: "workbenchdata.com/uses-rabbitmq=true"
+- path: s3-on-gcs.yaml
+  target:
+    labelSelector: "workbenchdata.com/uses-s3=true"
+- path: gcs-s3-cron.yaml
+  target:
+    name: cron*-deployment  # cron-deployment, cron-delta-deleter-deployment, cron-expired-session-deleter-deployment, cron-lesson-workflow-deleter-deployment
+- path: gcs-s3-fetcher.yaml
+  target:
+    name: fetcher-deployment
+- path: gcs-s3-frontend.yaml
+  target:
+    name: frontend-deployment
+- path: gcs-s3-renderer.yaml
+  target:
+    name: renderer-deployment

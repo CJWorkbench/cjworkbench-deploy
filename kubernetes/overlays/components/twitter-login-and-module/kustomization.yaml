@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+- path: twitter-config.yaml
+  target:
+    name: frontend-deployment  # for login
+- path: twitter-config.yaml
+  target:
+    name: fetcher-deployment  # for module-fetch

@@ -1,0 +1,54 @@
+bases:
+- ../gke
+
+components:
+- ../components/stripe
+- ../components/facebook-login
+- ../components/google-login-and-module
+- ../components/twitter-login-and-module
+- ../components/intercom-module
+- ../components/intercom-identity-verification
+
+replicas:
+- name: fetcher-deployment
+  count: 1
+- name: renderer-deployment
+  count: 1
+- name: frontend-deployment
+  count: 1
+
+configMapGenerator:
+- name: cjw-cloud-sql-config
+  behavior: replace
+  literals:
+  - PROJECT_NAME=workbench-staging
+  - POSTGRES_REGION=us-central1
+  - POSTGRES_INSTANCE_ID=postgres
+- name: workbench-config
+  behavior: replace
+  literals:
+  - domainName=workbenchdata-staging.com
+- name: cjw-google-analytics
+  behavior: replace
+  literals:
+  - CJW_GOOGLE_ANALYTICS=UA-104106561-1
+- name: cjw-heap-analytics
+  behavior: replace
+  literals:
+  - CJW_HEAP_ANALYTICS_ID=70406982
+- name: cjw-intercom
+  behavior: replace
+  literals:
+  - CJW_INTERCOM_APP_ID=u25xg9c6
+
+images:
+- name: gcr.io/workbenchdata-ci/cron
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/frontend
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/fetcher
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/renderer
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/cjw-intercom-sink
+  newTag: 98677d4a4fa499982b0dedf31a0c2fe1e1ab5467

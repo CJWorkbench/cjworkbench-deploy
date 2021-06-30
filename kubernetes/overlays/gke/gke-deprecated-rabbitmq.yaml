@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: _RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-1-rabbitmq-secret
+              key: rabbitmq-pass
+        - name: CJW_RABBITMQ_HOST
+          value: "amqp://rabbit:$(_RABBITMQ_PASSWORD)@rabbitmq-1-rabbitmq-svc"

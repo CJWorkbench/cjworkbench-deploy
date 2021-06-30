@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_DB_HOST
+          value: localhost  # cloud-sql-proxy
+        - name: CJW_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-cjworkbench-credentials
+              key: password
+      - name: cloudsql-proxy  # new pod
+        image: gcr.io/cloudsql-docker/gce-proxy:1.18.0
+        resources:
+          requests:
+            # Some non-zero values 
+            memory: 128Mi
+            cpu: 100m
+        envFrom:
+        - configMapRef:
+            name: cjw-cloud-sql-config  # PROJECT_NAME, POSTGRES_REGION, POSTGRES_INSTANCE_ID
+        command:
+        - "/cloud_sql_proxy"
+        - "-ip_address_types=PRIVATE"
+        - "-log_debug_stdout=true"
+        - "-instances=$(PROJECT_NAME):$(POSTGRES_REGION):$(POSTGRES_INSTANCE_ID)=tcp:5432"
+        - "-term_timeout=30s"
+        securityContext:
+          runAsNonRoot: true

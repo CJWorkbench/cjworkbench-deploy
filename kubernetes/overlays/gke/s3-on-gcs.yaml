@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: AWS_S3_ENDPOINT
+          value: https://storage.googleapis.com

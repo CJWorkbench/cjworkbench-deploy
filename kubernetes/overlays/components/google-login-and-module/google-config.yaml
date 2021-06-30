@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: many
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_GOOGLE_CLIENT_SECRETS
+          value: secrets/google-oauth-secret/google-oauth-secret.json
+        volumeMounts:
+        - mountPath: /app/secrets/google-oauth-secret
+          name: google-oauth-secret
+          readOnly: true
+      volumes:
+      - name: google-oauth-secret
+        secret:
+          secretName: google-oauth-secret
+          defaultMode: 0400
+          items:
+            - key: json
+              path: google-oauth-secret.json

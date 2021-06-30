@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_INTERCOM_IDENTITY_VERIFICATION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: frontend-intercom-secret
+              key: IDENTITY_VERIFICATION_SECRET
