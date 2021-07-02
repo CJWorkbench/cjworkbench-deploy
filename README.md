@@ -33,9 +33,12 @@ impede successful rollbacks, so be extra-careful when migrating.
 Do the deploy dance:
 
 1. Upload assets at version `$SHA` to the static web server
-2. Run new database migrations in version `$SHA`
+2. (simultaneously with 1) Run new database migrations in version `$SHA`
 3. Set all running images to version `$SHA`, with configs from `overlays/$ENVIRONMENT`
-4. Waits for rollout to finish
+4. Wait for rollout to finish
+
+BEWARE: this writes files, sullying the Git repository. Don't commit the
+changes.
 
 ## `clear-render-cache ENVIRONMENT`
 
@@ -64,10 +67,16 @@ give peace of mind.
 
 Run [advanced-deploy](#advanced-deploy) on production, with staging's `$SHA`.
 
+BEWARE: this writes files, sullying the Git repository. Don't commit the
+changes.
+
 ## `update-staging-to-latest-passing-master`
 
 Check GitHub for the "best" `$SHA`, and run [advanced-deploy](#advanced-deploy)
 on staging.
+
+BEWARE: this writes files, sullying the Git repository. Don't commit the
+changes.
 
 # Extra documentation
 

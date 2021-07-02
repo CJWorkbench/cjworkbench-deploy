@@ -1,0 +1,13 @@
+bases:
+- ../../migrate
+
+patches:
+- database-uses-sidecar.yaml
+- upload-assets-uses-gcs.yaml
+
+configMapGenerator:
+- name: cjw-cloud-sql-config
+  literals:
+  - PROJECT_NAME=
+  - POSTGRES_REGION=
+  - POSTGRES_INSTANCE_ID=

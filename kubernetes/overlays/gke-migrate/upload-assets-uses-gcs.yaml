@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: migrate-upload-assets-to-s3
+spec:
+  containers:
+  - name: app
+    env:
+    - name: AWS_S3_ENDPOINT
+      value: https://storage.googleapis.com
+    envFrom:
+    - secretRef:
+        name: gcs-s3-migrate-sa-credentials

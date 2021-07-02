@@ -1,0 +1,11 @@
+resources:
+- update-database-schema.yaml
+- upload-assets-to-s3.yaml
+
+components:
+- ../versions
+
+configMapGenerator:
+- name: workbench-config
+  literals:
+  - domainName=

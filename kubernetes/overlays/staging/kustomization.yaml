@@ -1,5 +1,3 @@
-bases:
-- ../gke
 
 components:
 - ../components/stripe
@@ -11,23 +9,36 @@ components:
 - ../components/staging-common
 
 replicas:
-- name: fetcher-deployment
-  count: 1
-- name: renderer-deployment
-  count: 1
-- name: frontend-deployment
-  count: 1
+- count: 1
+  name: fetcher-deployment
+- count: 1
+  name: renderer-deployment
+- count: 1
+  name: frontend-deployment
 
 configMapGenerator:
-- name: cjw-google-analytics
-  behavior: replace
+- behavior: replace
   literals:
   - CJW_GOOGLE_ANALYTICS=UA-104106561-1
-- name: cjw-heap-analytics
-  behavior: replace
+  name: cjw-google-analytics
+- behavior: replace
   literals:
   - CJW_HEAP_ANALYTICS_ID=70406982
-- name: cjw-intercom
-  behavior: replace
+  name: cjw-heap-analytics
+- behavior: replace
   literals:
   - CJW_INTERCOM_APP_ID=u25xg9c6
+  name: cjw-intercom
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../gke
+images:
+- name: gcr.io/workbenchdata-ci/cron
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/fetcher
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/frontend
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/renderer
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c

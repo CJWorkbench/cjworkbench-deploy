@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: migrate-update-database-schema
+spec:
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  serviceAccountName: migrate-sa
+  containers:
+  - name: app
+    image: gcr.io/workbenchdata-ci/migrate  # plus sha

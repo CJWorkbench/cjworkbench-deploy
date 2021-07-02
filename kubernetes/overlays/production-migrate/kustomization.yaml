@@ -1,0 +1,5 @@
+bases:
+- ../gke-migrate
+
+components:
+- ../components/production-common

@@ -1,53 +1,84 @@
 #!/bin/sh
 
 set -e
+set -x
 
 ENV=${1:?"Usage: $0 ENVIRONMENT SHA"}
 SHA=${2:?"Usage: $0 ENVIRONMENT SHA"}
+DIR="$(dirname "$0")"
 
 if [ "$ENV" = "staging" ]; then
-  CLUSTER="gke_workbench-staging_us-central1-b_workbench"
+  PROJECT=workbench-staging
 else
-  CLUSTER="gke_workbenchdata-production_us-central1-b_workbench"
+  PROJECT=workbenchdata-production
 fi
+CLUSTER="gke_${PROJECT}_us-central1-b_workbench"
 
 KUBECTL="kubectl.1.19 --cluster $CLUSTER"
 
-run_migrations() {
-  echo "Uploading assets for $SHA on $ENV..." >&2
-  $KUBECTL delete pod upload-assets-$SHA 2>/dev/null || true # delete if already running
-  overrides=$(cat "$(dirname "$0")"/kubernetes/upload-assets.json | sed -e "s/\\\$SHA/$SHA/")
-  $KUBECTL \
-    run upload-assets-$SHA \
-    --image="gcr.io/workbenchdata-ci/upload-assets:$SHA" \
-    -i --rm --quiet \
-    --restart=Never \
-    --overrides="$overrides"
+fail () {
+  echo "FAIL: $1" >&2
+  exit 1
+}
 
-  echo -n "Running migrations for $SHA on $ENV..." >&2
-  $KUBECTL delete pod migrate-$SHA 2>/dev/null || true # delete if already running
-  overrides=$(cat "$(dirname "$0")"/kubernetes/migrate.json | sed -e "s/\\\$SHA/$SHA/")
-  $KUBECTL \
-    run migrate-$SHA \
-    --image="gcr.io/workbenchdata-ci/migrate:$SHA" \
-    -i --rm --quiet \
-    --restart=Never \
-    --overrides="$overrides"
-  echo ' done' >&2
+set_versions () {
+  (cd "$DIR/kubernetes/versions" \
+    && for image in upload-assets migrate cron frontend fetcher renderer; do kustomize edit set image gcr.io/workbenchdata-ci/$image=*:"$SHA"; done \
+  )
+}
+
+wait_for_pod_to_exist () {
+  # kubectl wait is not the command for us:
+  # https://github.com/kubernetes/kubernetes/issues/83242
+  while true; do
+    $KUBECTL get pod "$1" && break || sleep 1
+  done
+
+  # Avoid races: don't check for Ready because a completed pod is not "Ready".
+  while test "$($KUBECTL get pod "$1" -ojsonpath='{.status.phase}')" = "Pending"; do
+    sleep 1  # wait
+  done
+}
+
+run_migrations() {
+  migration_id="$RANDOM"
+  # Don't worry about races. If three migrations -- same versions or otherwise --
+  # run concurrently, that should be fine. The pods themselves must handle these
+  # issues.
+  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
+    && kustomize edit set namesuffix -- "-$SHA-$migration_id" \
+    && kustomize build | $KUBECTL apply -f -
+  )
+
+  echo "Started migrations. Let's check on them..." >&2
+  wait_for_pod_to_exist "migrate-update-database-schema-$SHA-$migration_id"
+  $KUBECTL logs --follow --all-containers --timestamps "migrate-update-database-schema-$SHA-$migration_id"
+  wait_for_pod_to_exist "migrate-upload-assets-to-s3-$SHA-$migration_id"
+  $KUBECTL logs --follow --all-containers --timestamps "migrate-upload-assets-to-s3-$SHA-$migration_id"
+
+  echo "Checking for success..." >&2
+  test "$($KUBECTL get pod/migrate-upload-assets-to-s3-$SHA-$migration_id -ojsonpath='{.status.phase}')" = "Succeeded" || fail "Uploading assets failed"
+  test "$($KUBECTL get pod/migrate-update-database-schema-$SHA-$migration_id -ojsonpath='{.status.phase}')" = "Succeeded" || fail "Updating database schema failed"
+
+  echo "Cleaning up..." >&2
+  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
+    && kustomize build | $KUBECTL delete --wait -f -
+  )
+}
+
+apply_latest_services() {
+  # Don't worry about races. If three migrations -- same versions or otherwise --
+  # run concurrently, that should be fine. The pods themselves must handle these
+  # issues.
+  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
+    && kustomize build | $KUBECTL apply -f -)
 }
 
 run_migrations >&2
 
-echo -n "Setting frontend, fetcher, renderer and cron images to $SHA on $ENV..." >&2
-repo="gcr.io/workbenchdata-ci"
-$KUBECTL set image deployment/fetcher-deployment fetcher=$repo/fetcher:$SHA setup-sandboxes=$repo/fetcher:$SHA teardown-sandboxes=$repo/fetcher:$SHA >/dev/null
-$KUBECTL set image deployment/renderer-deployment renderer=$repo/renderer:$SHA setup-sandboxes=$repo/renderer:$SHA teardown-sandboxes=$repo/renderer:$SHA >/dev/null
-$KUBECTL set image deployment/frontend-deployment frontend=$repo/frontend:$SHA setup-sandboxes=$repo/frontend:$SHA teardown-sandboxes=$repo/frontend:$SHA >/dev/null
-$KUBECTL set image deployment/cron-delta-deleter-deployment cron=$repo/cron:$SHA >/dev/null
-$KUBECTL set image deployment/cron-deployment cron=$repo/cron:$SHA >/dev/null
-$KUBECTL set image deployment/cron-expired-session-deleter-deployment cron=$repo/cron:$SHA >/dev/null
-$KUBECTL set image deployment/cron-lesson-workflow-deleter-deployment cron=$repo/cron:$SHA >/dev/null
-echo ' done' >&2
+echo -n "Applying latest config..." >&2
+(cd kubernetes/overlays/$ENV \
+  && kustomize build . | $KUBECTL apply -f -)
 
 echo -n 'Waiting for rollout to finish' >&2
 for service in cron cron-delta-deleter cron-expired-session-deleter cron-lesson-workflow-deleter fetcher renderer frontend; do
@@ -57,4 +88,4 @@ done
 echo ' done' >&2
 
 echo >&2
-echo 'Inspect services at https://console.cloud.google.com/kubernetes/workload?project=workbench-staging' >&2
+echo "Inspect services at https://console.cloud.google.com/kubernetes/workload?project=$PROJECT" >&2
