@@ -67,18 +67,14 @@ run_migrations() {
 }
 
 apply_latest_services() {
-  # Don't worry about races. If three migrations -- same versions or otherwise --
-  # run concurrently, that should be fine. The pods themselves must handle these
-  # issues.
-  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
-    && kustomize build | $KUBECTL apply -f -)
+  echo -n "Applying latest config..." >&2
+  (cd "$DIR/kubernetes/overlays/$ENV" \
+    && kustomize build . | $KUBECTL apply -f -)
 }
 
+set_versions
 run_migrations >&2
-
-echo -n "Applying latest config..." >&2
-(cd kubernetes/overlays/$ENV \
-  && kustomize build . | $KUBECTL apply -f -)
+apply_latest_services >&2
 
 echo -n 'Waiting for rollout to finish' >&2
 for service in cron cron-delta-deleter cron-expired-session-deleter cron-lesson-workflow-deleter fetcher renderer frontend; do
