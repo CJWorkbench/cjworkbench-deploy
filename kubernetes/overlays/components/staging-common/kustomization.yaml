@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+configMapGenerator:
+- name: cjw-cloud-sql-config
+  behavior: replace
+  literals:
+  - PROJECT_NAME=workbench-staging
+  - POSTGRES_REGION=us-central1
+  - POSTGRES_INSTANCE_ID=postgres
+- name: workbench-config
+  behavior: replace
+  literals:
+  - domainName=workbenchdata-staging.com

@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+images:
+- name: gcr.io/workbenchdata-ci/upload-assets
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/migrate
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/cron
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/frontend
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/fetcher
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/renderer
+  newTag: 42078fa48f06907efc65625af8be5bed7498be6c
+- name: gcr.io/workbenchdata-ci/cjw-intercom-sink
+  newTag: 38d0dfbb2dc90a1c978b4bb80ea5b145cdfe3591
