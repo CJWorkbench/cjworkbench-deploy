@@ -39,7 +39,13 @@ patches:
     labelSelector: "workbenchdata.com/uses-s3=true"
 - path: gcs-s3-cron.yaml
   target:
-    name: cron*-deployment  # cron-deployment, cron-delta-deleter-deployment, cron-expired-session-deleter-deployment, cron-lesson-workflow-deleter-deployment
+    name: cron-delta-deleter-deployment
+- path: gcs-s3-cron.yaml
+  target:
+    name: cron-expired-session-deleter-deployment
+- path: gcs-s3-cron.yaml
+  target:
+    name: cron-lesson-workflow-deleter-deployment
 - path: gcs-s3-fetcher.yaml
   target:
     name: fetcher-deployment
