@@ -1,44 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fetcher-deployment
+  name: tusd-hooks-deployment
   labels:
     workbenchdata.com/unsafe: "true"
-    workbenchdata.com/preemptible: "true"
     workbenchdata.com/uses-database: "true"
     workbenchdata.com/uses-rabbitmq: "true"
     workbenchdata.com/uses-s3: "true"
 spec:
   selector:
     matchLabels:
-      app: fetcher-app
+      app: tusd-hooks-app
   template:
     metadata:
       labels:
-        app: fetcher-app
+        app: tusd-hooks-app
     spec:
-      serviceAccountName: fetcher-sa
+      serviceAccountName: frontend-sa  # needs basically all the same privs
       initContainers:
-        # setup-sandboxes.sh needs special privileges; run it in an init container.
-        #
-        # We run this command separately because it runs with privileged: true.
-        # (pyspawner shouldn't have permission to fiddle with the mount
-        # namespace, lest malicious code use that permission to somehow escape
-        # its sandbox.)
-        #
-        # See https://itnext.io/using-overlay-mounts-with-kubernetes-960375c05959
-        - name: setup-sandboxes
-          image: "gcr.io/workbenchdata-ci/fetcher:REPLACEME"
-          securityContext:
-            privileged: true  # so it can run mount and iptables
-          command: [ "bash", "-x", "/app/cjwkernel/setup-sandboxes.sh", "all" ]
-          volumeMounts:
-            - mountPath: /var/lib/cjwkernel/chroot
-              name: chroot
-              mountPropagation: Bidirectional  # expose mounts to main app
+      # setup-sandboxes.sh needs special privileges; run it in an init container.
+      #
+      # We run this command separately because it runs with privileged: true.
+      # (pyspawner shouldn't have permission to fiddle with the mount
+      # namespace, lest malicious code use that permission to somehow escape
+      # its sandbox.)
+      #
+      # See https://itnext.io/using-overlay-mounts-with-kubernetes-960375c05959
+      - name: setup-sandboxes
+        image: "gcr.io/workbenchdata-ci/tusd-hooks:REPLACEME"
+        securityContext:
+          privileged: true  # so it can run mount
+        command: [ "bash", "-x", "/app/cjwkernel/setup-sandboxes.sh", "only-readonly" ]
+        volumeMounts:
+        - mountPath: /var/lib/cjwkernel/chroot
+          name: chroot
+          mountPropagation: Bidirectional  # expose mounts to main app
       containers:
       - name: app
-        image: "gcr.io/workbenchdata-ci/fetcher:REPLACEME"
+        image: "gcr.io/workbenchdata-ci/tusd-hooks:REPLACEME"
+        ports:
+        - name: http
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
         envFrom: []
         env:
         - name: CJW_PRODUCTION
@@ -46,7 +52,7 @@ spec:
         - name: PYTHONUNBUFFERED
           value: '1'
         - name: ASGI_THREADS
-          value: '2'
+          value: '5'
         - name: _DOMAIN_NAME
           valueFrom:
             configMapKeyRef:
@@ -57,15 +63,11 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/cjwkernel/chroot
           name: chroot
-        securityContext:
-          capabilities:
-            add:
-              - NET_ADMIN # To create network interface for sandbox in cjwkernel
       - name: teardown-sandboxes
         # "any volume mounts created by Containers in Pods must be destroyed
         # (unmounted) by the Containers on termination"
         # -- https://kubernetes.io/docs/concepts/storage/volumes/#mount-propagation
-        image: "gcr.io/workbenchdata-ci/fetcher:REPLACEME"
+        image: "gcr.io/workbenchdata-ci/tusd-hooks:REPLACEME"
         command: ["sh", "-c", "sleep infinity"]  # do nothing, until exit. (sh responds to INT signal)
         securityContext:
           privileged: true  # so it can unmount

@@ -28,7 +28,7 @@ spec:
       #
       # See https://itnext.io/using-overlay-mounts-with-kubernetes-960375c05959
       - name: setup-sandboxes
-        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        image: "gcr.io/workbenchdata-ci/frontend:REPLACEME"
         securityContext:
           privileged: true  # so it can run mount
         command: [ "bash", "-x", "/app/cjwkernel/setup-sandboxes.sh", "only-readonly" ]
@@ -38,7 +38,7 @@ spec:
           mountPropagation: Bidirectional  # expose mounts to main app
       containers:
       - name: app
-        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        image: "gcr.io/workbenchdata-ci/frontend:REPLACEME"
         ports:
         - name: http
           containerPort: 8080
@@ -90,7 +90,7 @@ spec:
         # "any volume mounts created by Containers in Pods must be destroyed
         # (unmounted) by the Containers on termination"
         # -- https://kubernetes.io/docs/concepts/storage/volumes/#mount-propagation
-        image: "gcr.io/workbenchdata-ci/frontend:latest"
+        image: "gcr.io/workbenchdata-ci/frontend:REPLACEME"
         command: ["sh", "-c", "sleep infinity"]  # do nothing, until exit. (sh responds to INT signal)
         securityContext:
           privileged: true  # so it can unmount

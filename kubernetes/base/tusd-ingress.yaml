@@ -11,19 +11,28 @@ spec:
   - http:
       paths:
       - path: /files  # spelling #1
+        pathType: Exact
         # tusd allows POST to /files and /files/, to create files. This is a
         # SECURITY risk. Prevent end-user users from POSTing to /files by
         # responding with HTTP 404 if they try
         backend:
-          serviceName: http-404-service
-          servicePort: 80
+          service:
+            name: http-404-service
+            port:
+              number: 80
       - path: /files/  # spelling #2
+        pathType: Exact
         backend:
-          serviceName: http-404-service
-          servicePort: 80
-      - path: /files/*
+          service:
+            name: http-404-service
+            port:
+              number: 80
+      - path: /files/
+        pathType: Prefix
         # This is the crux of tusd: the actual already-created file uploads.
         # Let users POST to the ones they know the URLs for.
         backend:
-          serviceName: tusd-service
-          servicePort: 80
+          service:
+            name: tusd-service
+            port:
+              number: 80

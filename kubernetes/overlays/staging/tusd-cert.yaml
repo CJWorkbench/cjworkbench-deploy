@@ -5,4 +5,4 @@ metadata:
   name: tusd-cert
 spec:
   domains:
-    - upload.workbenchdata-staging.com
+  - upload.workbenchdata-staging.com

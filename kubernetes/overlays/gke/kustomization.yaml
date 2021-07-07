@@ -52,6 +52,12 @@ patches:
 - path: gcs-s3-frontend.yaml
   target:
     name: frontend-deployment
+- path: gcs-s3-frontend.yaml
+  target:
+    name: tusd-hooks-deployment
 - path: gcs-s3-renderer.yaml
   target:
     name: renderer-deployment
+- path: tusd-gcs-service-account.yaml
+  target:
+    name: tusd-deployment

@@ -21,7 +21,7 @@ spec:
       serviceAccountName: cron-sa
       containers:
       - name: app
-        image: "gcr.io/workbenchdata-ci/cron:latest"
+        image: "gcr.io/workbenchdata-ci/cron:REPLACEME"
         command: [ "bin/cron-expired-session-deleter" ]
         resources:
           requests:

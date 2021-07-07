@@ -7,8 +7,16 @@ resources:
 - frontend-deployment.yaml
 - frontend-internal-tusd-hooks-service.yaml
 - frontend-service.yaml
+- tusd-hooks-deployment.yaml
+- tusd-hooks-service.yaml
 - intercom-sink-deployment.yaml
 - renderer-deployment.yaml
+- http-404-deployment.yaml
+- http-404-service.yaml
+- tusd-deployment.yaml
+- tusd-service.yaml
+- tusd-internal-service.yaml
+- tusd-ingress.yaml
 
 components:
 - ../versions

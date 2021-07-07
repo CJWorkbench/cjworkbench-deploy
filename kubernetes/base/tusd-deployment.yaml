@@ -6,7 +6,6 @@ spec:
   selector:
     matchLabels:
       app: tusd-app
-  replicas: 2
   template:
     metadata:
       labels:
@@ -25,7 +24,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: tusd
-        image: tusproject/tusd:v1.4.0
+        image: tusproject/tusd:v1.6.0
         resources:
           requests:
             cpu: 0.3
@@ -39,12 +38,6 @@ spec:
             configMapKeyRef:
               name: workbench-config
               key: domainName
-        - name: GCS_SERVICE_ACCOUNT_FILE
-          value: /tusd-gcs-credentials/application_default_credentials.json
-        volumeMounts:
-        - mountPath: /tusd-gcs-credentials
-          name: tusd-gcs-credentials
-          readOnly: true
         readinessProbe:
           httpGet:
             path: /metrics
@@ -53,12 +46,5 @@ spec:
         - -port=8080
         - -behind-proxy
         - "-gcs-bucket=upload.$(DOMAIN_NAME)"
-        - "-hooks-http=http://frontend-internal-tusd-hooks-service/tusd-hooks"
+        - "-hooks-http=http://tusd-hooks-service/tusd-hooks"
         - -hooks-enabled-events=pre-finish
-      volumes:
-      - name: tusd-gcs-credentials
-        secret:
-          secretName: tusd-gcs-credentials
-          items:
-          - key: application_default_credentials.json
-            path: application_default_credentials.json

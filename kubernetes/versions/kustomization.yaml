@@ -5,14 +5,16 @@ images:
 - name: gcr.io/workbenchdata-ci/cjw-intercom-sink
   newTag: 38d0dfbb2dc90a1c978b4bb80ea5b145cdfe3591
 - name: gcr.io/workbenchdata-ci/cron
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
 - name: gcr.io/workbenchdata-ci/fetcher
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
 - name: gcr.io/workbenchdata-ci/frontend
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
 - name: gcr.io/workbenchdata-ci/migrate
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
 - name: gcr.io/workbenchdata-ci/renderer
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+- name: gcr.io/workbenchdata-ci/tusd-hooks
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
 - name: gcr.io/workbenchdata-ci/upload-assets
-  newTag: REPLACEME
+  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58

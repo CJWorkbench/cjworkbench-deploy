@@ -1,6 +1,9 @@
 bases:
 - ../gke
 
+resources:
+- tusd-cert.yaml
+
 components:
 - ../components/stripe
 - ../components/facebook-login
@@ -9,6 +12,7 @@ components:
 - ../components/intercom-module
 - ../components/intercom-identity-verification
 - ../components/production-common
+- ../../versions
 
 replicas:
 - name: fetcher-deployment
