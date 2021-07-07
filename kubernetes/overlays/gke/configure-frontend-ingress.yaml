@@ -1,0 +1,9 @@
+- op: add
+  path: /metadata/annotations/kubernetes.io~1ingress.global-static-ip-name
+  value: app-ip
+- op: add
+  path: /metadata/annotations/networking.gke.io~1managed-certificates
+  value: app-cert
+- op: add
+  path: /metadata/annotations/networking.gke.io~1v1beta1.FrontendConfig
+  value: frontend-frontend-config

@@ -3,6 +3,7 @@ bases:
 
 resources:
 - tusd-cert.yaml
+- frontend-cert.yaml
 
 components:
 - ../components/stripe

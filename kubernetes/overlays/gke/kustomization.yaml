@@ -1,10 +1,8 @@
 bases:
 - ../../base
 
-patches:
-- scale-fetcher.yaml  # same size on staging+production
-- scale-renderer.yaml  # same size on staging+production
-- scale-frontend.yaml  # same size on staging+production
+resources:
+- frontend-ingress-configs.yaml
 
 replicas:
 - name: fetcher-deployment
@@ -61,3 +59,15 @@ patches:
 - path: tusd-gcs-service-account.yaml
   target:
     name: tusd-deployment
+- path: configure-frontend-ingress.yaml
+  target:
+    name: frontend-ingress
+- path: scale-fetcher.yaml  # same size on staging+production
+  target:
+    name: fetcher-deployment
+- path: scale-renderer.yaml  # same size on staging+production
+  target:
+    name: renderer-deployment
+- path: scale-frontend.yaml  # same size on staging+production
+  target:
+    name: frontend-deployment

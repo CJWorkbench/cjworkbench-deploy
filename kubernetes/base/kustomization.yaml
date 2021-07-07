@@ -7,6 +7,7 @@ resources:
 - frontend-deployment.yaml
 - frontend-internal-tusd-hooks-service.yaml
 - frontend-service.yaml
+- frontend-ingress.yaml
 - tusd-hooks-deployment.yaml
 - tusd-hooks-service.yaml
 - intercom-sink-deployment.yaml
