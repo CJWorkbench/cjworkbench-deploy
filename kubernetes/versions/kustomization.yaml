@@ -5,16 +5,16 @@ images:
 - name: gcr.io/workbenchdata-ci/cjw-intercom-sink
   newTag: 38d0dfbb2dc90a1c978b4bb80ea5b145cdfe3591
 - name: gcr.io/workbenchdata-ci/cron
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/fetcher
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/frontend
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/migrate
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/renderer
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/tusd-hooks
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
 - name: gcr.io/workbenchdata-ci/upload-assets
-  newTag: b171f6647fefc85e1ffec764a75826ddc794bb58
+  newTag: 29a2aa4e6f688bc3b273c779f55ac5d242435791
