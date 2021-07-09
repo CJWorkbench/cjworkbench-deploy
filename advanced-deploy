@@ -8,11 +8,22 @@ SHA=${2:?"Usage: $0 ENVIRONMENT SHA"}
 DIR="$(dirname "$0")"
 
 if [ "$ENV" = "staging" ]; then
-  PROJECT=workbench-staging
+  CLUSTER="gke_workbench-staging_us-central1-b_workbench"
+  OVERLAY="kubernetes/overlays/staging"
+elif [ "$ENV" = "production" ]; then
+  CLUSTER="gke_workbenchdata-production_us-central1-b_workbench"
+  OVERLAY="kubernetes/overlays/production"
 else
-  PROJECT=workbenchdata-production
+  CLUSTER="$ENV"
+  echo ${OVERLAY:?"Usage: OVERLAY=../path/to/overlay $0 CLUSTER SHA"} >/dev/null
 fi
-CLUSTER="gke_${PROJECT}_us-central1-b_workbench"
+
+echo "Deploying $OVERLAY to CLUSTER=$CLUSTER >&2"
+
+if test -n "$PS1"; then
+  echo "If you're not sure about this, press Ctrl+C now!"
+  sleep 3
+fi
 
 KUBECTL="kubectl.1.19 --cluster $CLUSTER"
 
@@ -45,7 +56,7 @@ run_migrations() {
   # Don't worry about races. If three migrations -- same versions or otherwise --
   # run concurrently, that should be fine. The pods themselves must handle these
   # issues.
-  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
+  (cd "$DIR/$OVERLAY-migrate" \
     && kustomize edit set namesuffix -- "-$SHA-$migration_id" \
     && kustomize build | $KUBECTL apply -f -
   )
@@ -61,14 +72,14 @@ run_migrations() {
   test "$($KUBECTL get pod/migrate-update-database-schema-$SHA-$migration_id -ojsonpath='{.status.phase}')" = "Succeeded" || fail "Updating database schema failed"
 
   echo "Cleaning up..." >&2
-  (cd "$DIR/kubernetes/overlays/$ENV-migrate" \
+  (cd "$DIR/$OVERLAY-migrate" \
     && kustomize build | $KUBECTL delete --wait -f -
   )
 }
 
 apply_latest_services() {
   echo -n "Applying latest config..." >&2
-  (cd "$DIR/kubernetes/overlays/$ENV" \
+  (cd "$DIR/$OVERLAY" \
     && kustomize build . | $KUBECTL apply -f -)
 }
 
@@ -82,6 +93,3 @@ for service in cron cron-delta-deleter cron-expired-session-deleter cron-lesson-
   echo -n '.' >&2
 done
 echo ' done' >&2
-
-echo >&2
-echo "Inspect services at https://console.cloud.google.com/kubernetes/workload?project=$PROJECT" >&2
