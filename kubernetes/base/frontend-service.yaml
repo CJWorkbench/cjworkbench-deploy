@@ -3,12 +3,10 @@ apiVersion: v1
 metadata:
   name: frontend-service
   annotations:
-    cloud.google.com/neg: '{"ingress": true}'  # https://cloud.google.com/kubernetes-engine/docs/how-to/container-native-load-balancing
-    cloud.google.com/backend-config: '{"default": "websockets-backend-config"}'
 spec:
   selector:
     app: frontend-app
-  type: NodePort
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 80

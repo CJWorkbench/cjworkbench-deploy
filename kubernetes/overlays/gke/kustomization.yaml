@@ -59,6 +59,12 @@ patches:
 - path: tusd-gcs-service-account.yaml
   target:
     name: tusd-deployment
+- path: service-use-ingress-configs.yaml
+  target:
+    name: frontend-service
+- path: service-use-ingress-configs.yaml
+  target:
+    name: tusd-service
 - path: configure-frontend-ingress.yaml
   target:
     name: frontend-ingress

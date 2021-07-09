@@ -1,7 +1,7 @@
 Relies on these secrets in the default namespace:
 
 * `cjw-smtp-config`: `HOST`, `USER`, `PASSWORD`, `PORT`, `USE_TLS`
-* `cjw-secret-key`: `SECRET_KEY`
+* `cjw-secret-key`: `value`
 * `frontend-intercom-secret`: `IDENTITY_VERIFICATION_SECRET`
 * `cjw-intercom-sink-intercom-secret`: `ACCESS_TOKEN`
 

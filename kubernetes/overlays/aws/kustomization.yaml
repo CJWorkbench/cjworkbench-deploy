@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../base
+
+patches:
+- path: aws-sql.yaml
+  target:
+    labelSelector: "workbenchdata.com/uses-database=true"
+- path: aws-select-ondemand-nodes.yaml
+  target:
+    kind: Deployment
+    labelSelector: "workbenchdata.com/preemptible!=true"
+- path: aws-select-spot-nodes.yaml
+  target:
+    labelSelector: "workbenchdata.com/preemptible=true"
+- path: aws-rabbitmq.yaml
+  target:
+    labelSelector: "workbenchdata.com/uses-rabbitmq=true"
+- path: alb-ingress.yaml
+  target:
+    kind: Ingress
+- path: configure-frontend-ingress.yaml
+  target:
+    name: frontend-ingress
+- path: configure-tusd-ingress.yaml
+  target:
+    name: tusd-ingress
+- path: scale-fetcher.yaml
+  target:
+    name: fetcher-deployment
+- path: scale-renderer.yaml
+  target:
+    name: renderer-deployment
+- path: scale-frontend.yaml
+  target:
+    name: frontend-deployment

@@ -5,8 +5,8 @@ metadata:
 spec:
   selector:
     app: tusd-app
-  type: NodePort
+  type: ClusterIP
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

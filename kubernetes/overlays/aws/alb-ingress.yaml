@@ -1,0 +1,15 @@
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1group.name
+  value: workbench-ingress  # All ingresses will share one ALB
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1target-type
+  value: ip
+- op: add
+  path: /metadata/annotations/kubernetes.io~1ingress.class
+  value: alb
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1scheme
+  value: internet-facing
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1healthcheck-protocol
+  value: HTTP

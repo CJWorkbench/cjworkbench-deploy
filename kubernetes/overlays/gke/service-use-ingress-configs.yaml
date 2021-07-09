@@ -1,0 +1,7 @@
+# https://cloud.google.com/kubernetes-engine/docs/how-to/container-native-load-balancing
+- op: add
+  path: /metadata/annotations/cloud.google.com~1neg
+  value: '{"ingress":true}'
+- op: add
+  path: /metadata/annotations/cloud.google.com~1backend-config
+  value: '{"default":"websockets-backend-config"}'

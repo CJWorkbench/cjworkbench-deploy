@@ -1,0 +1,5 @@
+bases:
+- ../../migrate
+
+patches:
+- sql-uses-secret.yaml

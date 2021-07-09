@@ -5,6 +5,7 @@ metadata:
 spec:
   restartPolicy: Never
   terminationGracePeriodSeconds: 0
+  serviceAccountName: migrate-sa
   containers:
   - name: app
     image: gcr.io/workbenchdata-ci/upload-assets  # plus SHA

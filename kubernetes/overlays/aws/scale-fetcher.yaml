@@ -1,0 +1,17 @@
+kind: Deployment
+metadata:
+  name: fetcher-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        resources:
+          # fetch() functions are usually network-constrained: CPU and RAM
+          # usage are low.
+          requests:
+            cpu: 300m
+            memory: 1Gi
+          limits:
+            cpu: 300m
+            memory: 1Gi

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        - name: CJW_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: postgres-cjworkbench-credentials
+              key: host
+        - name: CJW_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-cjworkbench-credentials
+              key: password

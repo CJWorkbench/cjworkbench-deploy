@@ -45,6 +45,6 @@ spec:
         args:
         - -port=8080
         - -behind-proxy
-        - "-gcs-bucket=upload.$(DOMAIN_NAME)"
+        - "-s3-bucket=upload.$(DOMAIN_NAME)"
         - "-hooks-http=http://tusd-hooks-service/tusd-hooks"
         - -hooks-enabled-events=pre-finish

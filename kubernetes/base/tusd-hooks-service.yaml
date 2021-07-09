@@ -2,9 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: tusd-hooks-service
-  annotations:
-    cloud.google.com/neg: '{"ingress": true}'  # https://cloud.google.com/kubernetes-engine/docs/how-to/container-native-load-balancing
-    cloud.google.com/backend-config: '{"default": "websockets-backend-config"}'
 spec:
   type: ClusterIP
   selector:

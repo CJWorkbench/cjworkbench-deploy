@@ -1,0 +1,14 @@
+# All ingresses will share an ALB. Configure Host so they coexist nicely.
+- op: add
+  path: /spec/rules/0/host
+  value: upload.$(DOMAIN_NAME)
+
+# Health checks
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1healthcheck-path
+  value: /metrics
+
+# SSL
+- op: add
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1certificate-arn
+  value: $(UPLOAD_CERT_ARN)

@@ -1,0 +1,17 @@
+kind: Deployment
+metadata:
+  name: renderer-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        resources:
+          # Request between 1-2 CPUs and tons of RAM. render() functions are
+          # synchronous, 2 CPUs minus SMT penalty is 1 CPU.
+          requests:
+            cpu: 1500m
+            memory: 5.5Gi
+          limits:
+            cpu: 1500m
+            memory: 5.5Gi
