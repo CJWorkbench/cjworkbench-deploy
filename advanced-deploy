@@ -51,6 +51,21 @@ wait_for_pod_to_exist () {
   done
 }
 
+wait_for_pod_success () {
+  # When a pod finally finishes, it's either "Succeeded" or "Failed".
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+  while true; do
+    pod_status="$($KUBECTL get pod "$1" -ojsonpath='{.status.phase}')"
+    if test "$pod_status" = "Succeeded"; then
+      break
+    fi
+    if test "$pod_status" = "Failed"; then
+      fail "$2"
+    fi
+    sleep 1  # and loop, indefinitely
+  done
+}
+
 run_migrations() {
   migration_id="$RANDOM"
   # Don't worry about races. If three migrations -- same versions or otherwise --
@@ -68,8 +83,8 @@ run_migrations() {
   $KUBECTL logs --follow --all-containers --timestamps "migrate-upload-assets-to-s3-$SHA-$migration_id"
 
   echo "Checking for success..." >&2
-  test "$($KUBECTL get pod/migrate-upload-assets-to-s3-$SHA-$migration_id -ojsonpath='{.status.phase}')" = "Succeeded" || fail "Uploading assets failed"
-  test "$($KUBECTL get pod/migrate-update-database-schema-$SHA-$migration_id -ojsonpath='{.status.phase}')" = "Succeeded" || fail "Updating database schema failed"
+  wait_for_pod_success "migrate-upload-assets-to-s3-$SHA-$migration_id" "Uploading assets failed"
+  wait_for_pod_success "migrate-update-database-schema-$SHA-$migration_id" "Updating database schema filed"
 
   echo "Cleaning up..." >&2
   (cd "$DIR/$OVERLAY-migrate" \
