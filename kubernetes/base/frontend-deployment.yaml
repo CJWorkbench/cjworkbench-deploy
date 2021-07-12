@@ -70,6 +70,16 @@ spec:
               key: value
         - name: HTTPS
           value: 'on'
+        - name: CJW_HOME_URL
+          valueFrom:
+            configMapKeyRef:
+              name: workbench-config
+              key: homeUrl
+        - name: CJW_HELP_EMAIL
+          valueFrom:
+            comnfigMapKeyRef:
+              name: workbench-config
+              key: helpEmail
         - name: _DOMAIN_NAME
           valueFrom:
             configMapKeyRef:

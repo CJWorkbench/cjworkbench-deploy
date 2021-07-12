@@ -12,3 +12,5 @@ configMapGenerator:
   behavior: replace
   literals:
   - domainName=workbenchdata.com
+  - "homeUrl=https://workbenchdata.com"
+  - "helpEmail=hello@workbenchdata.com"
