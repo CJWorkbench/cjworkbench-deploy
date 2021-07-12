@@ -1,6 +1,6 @@
 Relies on these secrets in the default namespace:
 
-* `cjw-smtp-config`: `HOST`, `USER`, `PASSWORD`, `PORT`, `USE_TLS`
+* `cjw-smtp-config`: `HOST`, `USER`, `PASSWORD`, `PORT`, `USE_TLS`, `FROM`
 * `cjw-secret-key`: `value`
 * `frontend-intercom-secret`: `IDENTITY_VERIFICATION_SECRET`
 * `cjw-facebook-secret`: `client_id`, `secret`

@@ -49,7 +49,7 @@ spec:
         envFrom:
         - secretRef:
             name: cjw-smtp-config
-          prefix: CJW_SMTP_  # CJW_SMTP_HOST, CJW_SMTP_USER, CJW_SMTP_PASSWORD, CJW_SMTP_PORT, CJW_SMTP_USE_TLS
+          prefix: CJW_SMTP_  # CJW_SMTP_HOST, CJW_SMTP_USER, CJW_SMTP_PASSWORD, CJW_SMTP_PORT, CJW_SMTP_USE_TLS, CJW_SMTP_FROM
         - configMapRef:
             name: cjw-heap-analytics  # CJW_HEAP_ANALYTICS_ID
         - configMapRef:
