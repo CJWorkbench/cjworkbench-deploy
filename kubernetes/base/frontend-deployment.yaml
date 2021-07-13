@@ -77,7 +77,7 @@ spec:
               key: homeUrl
         - name: CJW_HELP_EMAIL
           valueFrom:
-            comnfigMapKeyRef:
+            configMapKeyRef:
               name: workbench-config
               key: helpEmail
         - name: _DOMAIN_NAME
