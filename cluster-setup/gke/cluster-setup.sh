@@ -52,7 +52,7 @@ gcloud projects add-iam-policy-binding $PROJECT_NAME \
   --member "serviceAccount:$CLUSTER_NAME-least-privilege-sa@$PROJECT_NAME.iam.gserviceaccount.com" \
   --role roles/monitoring.viewer
 
-for service in frontend fetcher renderer cron migrate tusd; do
+for service in datasets frontend fetcher renderer cron migrate tusd; do
   gcloud iam service-accounts create $CLUSTER_NAME-$service-sa \
     --display-name=$CLUSTER_NAME-$service-sa
 
@@ -62,7 +62,7 @@ for service in frontend fetcher renderer cron migrate tusd; do
     "$CLUSTER_NAME-$service-sa@$PROJECT_NAME.iam.gserviceaccount.com"
 done
 
-for service in frontend fetcher renderer cron migrate; do
+for service in datasets frontend fetcher renderer cron migrate; do
   gcloud projects add-iam-policy-binding $PROJECT_NAME \
     --member "serviceAccount:$CLUSTER_NAME-$service-sa@$PROJECT_NAME.iam.gserviceaccount.com" \
     --role roles/cloudsql.client

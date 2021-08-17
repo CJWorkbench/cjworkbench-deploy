@@ -29,7 +29,7 @@ eksctl create cluster \
   --without-nodegroup \
   --disable-pod-imds
 
-for service in frontend fetcher renderer cron migrate tusd; do
+for service in datasets frontend fetcher renderer cron migrate tusd; do
   aws iam create-policy \
     --policy-name $CLUSTER_NAME-$service-policy \
     --policy-document file://"$DIR"/iam/$service-policy.json

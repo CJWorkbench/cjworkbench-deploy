@@ -13,18 +13,10 @@ else
   PROJECT_NAME="workbench-staging"
 fi
 
-gsutil mb gs://user-files.$DOMAIN_NAME
-gsutil mb gs://static.$DOMAIN_NAME
-gsutil mb gs://stored-objects.$DOMAIN_NAME
-gsutil mb gs://external-modules.$DOMAIN_NAME
-gsutil mb gs://cached-render-results.$DOMAIN_NAME
-gsutil mb gs://upload.$DOMAIN_NAME
-gsutil ubla set on gs://user-files.$DOMAIN_NAME
-gsutil ubla set on gs://static.$DOMAIN_NAME
-gsutil ubla set on gs://stored-objects.$DOMAIN_NAME
-gsutil ubla set on gs://external-modules.$DOMAIN_NAME
-gsutil ubla set on gs://cached-render-results.$DOMAIN_NAME
-gsutil ubla set on gs://upload.$DOMAIN_NAME
+for name in cached-render-results datasets external-modules static stored-objects upload user-files; do
+  gsutil mb gs://$name.$DOMAIN_NAME
+  gsutil ubla set on gs://$name.$DOMAIN_NAME
+done
 
 gcloud iam service-accounts keys create application_default_credentials.json \
   --iam-account $CLUSTER_NAME-tusd@$PROJECT_NAME.iam.gserviceaccount.com
@@ -63,6 +55,13 @@ gsutil iam ch \
   serviceAccount:$CLUSTER_NAME-frontend-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectAdmin \
   serviceAccount:$CLUSTER_NAME-renderer-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectViewer \
   gs://stored-objects.$DOMAIN_NAME
+# datasets: datasets reads; cron deletes; frontend deletes; renderer writes
+gsutil iam ch \
+  serviceAccount:$CLUSTER_NAME-cron-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectAdmin \
+  serviceAccount:$CLUSTER_NAME-datasets-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectViewer \
+  serviceAccount:$CLUSTER_NAME-frontend-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectAdmin \
+  serviceAccount:$CLUSTER_NAME-renderer-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectAdmin \
+  gs://datasets.$DOMAIN_NAME
 # user-files: cron deletes; frontend writes; fetcher+renderer read
 gsutil iam ch \
   serviceAccount:$CLUSTER_NAME-cron-sa@$PROJECT_NAME.iam.gserviceaccount.com:objectAdmin \

@@ -1,9 +1,6 @@
-aws s3 mb s3://user-files.$DOMAIN_NAME
-aws s3 mb s3://static.$DOMAIN_NAME
-aws s3 mb s3://stored-objects.$DOMAIN_NAME
-aws s3 mb s3://external-modules.$DOMAIN_NAME
-aws s3 mb s3://cached-render-results.$DOMAIN_NAME
-aws s3 mb s3://upload.$DOMAIN_NAME
+for name in cached-render-results datasets external-modules static stored-objects upload user-files; do
+  aws s3 mb s3://$name.$DOMAIN_NAME
+done
 
 # Uploads expire after 1d
 echo '{"Rules":[{"Expiration":{"Days":1},"Prefix":"","Status":"Enabled","AbortIncompleteMultipartUpload":{"DaysAfterInitiation":1}}]}' \
